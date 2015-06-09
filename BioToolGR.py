@@ -42,7 +42,7 @@ class BioToolGR:
 
     def pick_random_columns(self,kernel,outcome,k,duplicated=True):
         num = 0
-        bucket = []
+        bucket = [False for i in xrange(column_len)]
         new_kernel = pd.DataFrame()
         new_outcome = pd.DataFrame()
         column_len = len(kernel.columns)
@@ -50,9 +50,9 @@ class BioToolGR:
         while num < k:
             r = random.randint(0,column_len-1)
             if not duplicated:
-                if r in bucket:
+				if bucket[r]:
                     continue
-                bucket.append(r)
+				bucket[r] = True
 
             new_kernel = new_kernel.append(kernel.iloc[:,r])
             new_outcome = new_outcome.append(outcome.loc[r])
@@ -143,33 +143,33 @@ class BioToolGR:
         self.build_nextcox_set(output)
 
     # 2015 6-8
-    def HynOrder3(self):
-        METH = self.parse('METH.txt')
-        CNA = self.parse('CNA.txt')
-        mRNA = self.parse('mRNA.txt')
-        sym = self.parse('sym.txt')
-        target_gene = self.parse('target_gene.txt')
-        outcome = self.parse('clinical.txt')
+    def HyunOrder3(self):
+        METH = self.parse('original-data/METH.txt')
+        CNA = self.parse('original-data/CNA.txt')
+        mRNA = self.parse('original-data/mRNA.txt')
+        sym = self.parse('original-data/sym.txt')
+        target_gene = self.parse('original-data/target_gene.txt')
+        outcome = self.parse('original-data/clinical.txt')
         
         METH_filtered = self.build_target_kernel(METH,sym,target_gene)
         CNA_filtered = self.build_target_kernel(CNA,sym,target_gene)
         mRNA_filtered = self.build_target_kernel(mRNA,sym,target_gene)
 
-        METH_name = "METH_filtered_random"
-        CNA_name = "CNA_filtered_random"
-        mRNA_name = "mRNA_filtered_random"
-        clinical_name = "clinical"
+        METH_name = "sampling-data/METH_sample"
+        CNA_name = "sampling-data/CNA_sample"
+        mRNA_name = "sampling-data/mRNA_sample"
+        clinical_name = "sampling-data/clinical"
         for i in range(100):
-            METH_filtered_random,new_outcome = self.pick_random_columns(METH_filtered,outcome,int(len(CNA.columns)*9/10.0),False)
-            CNA_filtered_random,new_outcome = self.pick_random_columns(CNA_filtered,outcome,int(len(CNA_filtered.columns)*9/10.0),False)
-            mRNA_filtered_random,new_outcome = self.pick_random_columns(mRNA_filtered,outcome,int(len(mRNA_filtered.columns)*9/10.0),False)
+            METH_filtered,new_outcome = self.pick_random_columns(METH_filtered,outcome,int(len(CNA.columns)*9/10.0),False)
+            CNA_filtered,new_outcome = self.pick_random_columns(CNA_filtered,outcome,int(len(CNA_filtered.columns)*9/10.0),False)
+            mRNA_filtered,new_outcome = self.pick_random_columns(mRNA_filtered,outcome,int(len(mRNA_filtered.columns)*9/10.0),False)
 
-            METH_filtered_random = METH_filtered_random.transpose()
-            CNA_filtered_random = CNA_filtered_random.transpose()
-            mRNA_filtered_random = mRNA_filtered_random.transpose()
+            METH_filtered = METH_filtered.transpose()
+            CNA_filtered = CNA_filtered.transpose()
+            mRNA_filtered = mRNA_filtered.transpose()
         
-            self.write_csv(METH_filtered_random,METH_name + str(i) + '.txt')
-            self.write_csv(CNA_filtered_random,CNA_name + str(i) + '.txt')
-            self.write_csv(mRNA_filtered_random,mRNA_name + str(i) + '.txt')
+            self.write_csv(METH_filtered,METH_name + str(i) + '.txt')
+            self.write_csv(CNA_filtered,CNA_name + str(i) + '.txt')
+            self.write_csv(mRNA_filtered,mRNA_name + str(i) + '.txt')
         
             new_outcome.to_csv(clinical_name + str(i) + '.txt',index=False)
