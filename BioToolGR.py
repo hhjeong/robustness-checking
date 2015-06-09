@@ -38,21 +38,21 @@ class BioToolGR:
         return filtered_kernel
     
     def write_csv(self,dataframe,filename):
-        dataframe.to_csv(filename,sep='\t')
+        dataframe.to_csv(filename,sep='\t',header=False,index=False)
 
     def pick_random_columns(self,kernel,outcome,k,duplicated=True):
         num = 0
-        bucket = [False for i in xrange(column_len)]
         new_kernel = pd.DataFrame()
         new_outcome = pd.DataFrame()
         column_len = len(kernel.columns)
-        
+        bucket = [False for i in xrange(column_len)]
+
         while num < k:
             r = random.randint(0,column_len-1)
             if not duplicated:
-				if bucket[r]:
+                if bucket[r]:
                     continue
-				bucket[r] = True
+                bucket[r] = True
 
             new_kernel = new_kernel.append(kernel.iloc[:,r])
             new_outcome = new_outcome.append(outcome.loc[r])
@@ -160,13 +160,13 @@ class BioToolGR:
         mRNA_name = "sampling-data/mRNA_sample"
         clinical_name = "sampling-data/clinical"
         for i in range(100):
-            METH_filtered,new_outcome = self.pick_random_columns(METH_filtered,outcome,int(len(CNA.columns)*9/10.0),False)
-            CNA_filtered,new_outcome = self.pick_random_columns(CNA_filtered,outcome,int(len(CNA_filtered.columns)*9/10.0),False)
-            mRNA_filtered,new_outcome = self.pick_random_columns(mRNA_filtered,outcome,int(len(mRNA_filtered.columns)*9/10.0),False)
+            METH_filtered_sample,new_outcome = self.pick_random_columns(METH_filtered,outcome,int(len(CNA.columns)*9/10.0),False)
+            CNA_filtered_sample,new_outcome = self.pick_random_columns(CNA_filtered,outcome,int(len(CNA_filtered.columns)*9/10.0),False)
+            mRNA_filtered_sample,new_outcome = self.pick_random_columns(mRNA_filtered,outcome,int(len(mRNA_filtered.columns)*9/10.0),False)
 
-            METH_filtered = METH_filtered.transpose()
-            CNA_filtered = CNA_filtered.transpose()
-            mRNA_filtered = mRNA_filtered.transpose()
+            METH_filtered_sample = METH_filtered.transpose()
+            CNA_filtered_sample = CNA_filtered.transpose()
+            mRNA_filtered_sample = mRNA_filtered.transpose()
         
             self.write_csv(METH_filtered,METH_name + str(i) + '.txt')
             self.write_csv(CNA_filtered,CNA_name + str(i) + '.txt')
