@@ -167,9 +167,10 @@ class BioToolGR:
             CNA_filtered_random = CNA_filtered_random.transpose()
             mRNA_filtered_random = mRNA_filtered_random.transpose()
         
-            METH_filtered_random.to_csv(METH_name + str(i) + '.txt',index=False,header=False)
-            CNA_filtered_random.to_csv(CNA_name + str(i) + '.txt',index=False,header=False)
-            mRNA_filtered_random.to_csv(mRNA_name + str(i) + '.txt',index=False,header=False)
+            METH_filtered_random.to_csv(METH_name + str(i) + '.txt',sep='\t',index=False,header=False)
+            CNA_filtered_random = CNA_filtered_random.astype(int)
+            CNA_filtered_random.to_csv(CNA_name + str(i) + '.txt',sep='\t',index=False,header=False)
+            mRNA_filtered_random.to_csv(mRNA_name + str(i) + '.txt',sep='\t',index=False,header=False)
         
             new_outcome = new_outcome.astype(int)
             new_outcome.to_csv(clinical_name + str(i) + '.txt',index=False,header=False)
