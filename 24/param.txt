@@ -1,0 +1,9 @@
+Informations
+Start time : 2015-06-10.15:19:41
+method : dist
+geneInfo : target_gene.txt
+profiles : mRNA_filtered_random24.txt,CNA_filtered_random24.txt,METH_filtered_random24.txt
+clinical : clinical24.txt
+maxPerm : 0
+alpha :0
+outpath : output/24/
