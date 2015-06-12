@@ -1,9 +1,0 @@
-Informations
-Start time : 2015-06-10.15:22:58
-method : dist
-geneInfo : target_gene.txt
-profiles : mRNA_filtered_random95.txt,CNA_filtered_random95.txt,METH_filtered_random95.txt
-clinical : clinical95.txt
-maxPerm : 0
-alpha :0
-outpath : output/95/

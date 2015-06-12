@@ -1,9 +1,0 @@
-Informations
-Start time : 2015-06-10.15:22:09
-method : dist
-geneInfo : target_gene.txt
-profiles : mRNA_filtered_random77.txt,CNA_filtered_random77.txt,METH_filtered_random77.txt
-clinical : clinical77.txt
-maxPerm : 0
-alpha :0
-outpath : output/77/
