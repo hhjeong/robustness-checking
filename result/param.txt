@@ -1,0 +1,9 @@
+Informations
+Start time : 2015-06-16.22:59:24
+method : dist
+geneInfo : sampling-data/target_gene.txt
+profiles : sampling-data/mRNA_filtered_random99.txt,sampling-data/CNA_filtered_random99.txt,sampling-data/METH_filtered_random99.txt
+clinical : sampling-data/clinical99.txt
+maxPerm : 0
+alpha :6.94567e-310
+outpath : result/
