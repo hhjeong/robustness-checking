@@ -141,6 +141,28 @@ class BioToolGR:
     def HyunOrder2(self,output):
         self.build_nextcox_set(output)
 
+    # 2015 6-17
+    def HynOrder4(self):
+        METH = self.parse('original-data/METH.txt')
+        CNA = self.parse('original-data/CNA.txt')
+        mRNA = self.parse('original-data/mRNA.txt')
+        sym = self.parse('original-data/sym.txt')
+        target_gene = self.parse('original-data/target_gene.txt')
+        
+        METH_filtered = self.build_target_kernel(METH,sym,target_gene)
+        CNA_filtered = self.build_target_kernel(CNA,sym,target_gene)
+        mRNA_filtered = self.build_target_kernel(mRNA,sym,target_gene)
+
+        METH_name = "sampling-data/METH_filtered"
+        CNA_name = "sampling-data/CNA_filtered"
+        mRNA_name = "sampling-data/mRNA_filtered"
+
+        METH_filtered.to_csv(METH_name+'.txt',sep='\t',index=False,header=False)
+        CNA_filtered = CNA_filtered.astype(int)
+        CNA_filtered.to_csv(CNA_name+'.txt',sep='\t',index=False,header=False)
+        mRNA_filtered.to_csv(mRNA_name+'.txt',sep='\t',index=False,header=False)
+        
+
     # 2015 6-8
     def HynOrder3(self):
         METH = self.parse('METH.txt')

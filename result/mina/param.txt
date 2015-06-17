@@ -1,0 +1,9 @@
+Informations
+Start time : 2015-06-17.17:42:01
+method : dist
+geneInfo : sampling-data/target_gene.txt
+profiles : sampling-data/mRNA_filtered.txt,sampling-data/CNA_filtered.txt,sampling-data/METH_filtered.txt
+clinical : sampling-data/clinical.txt
+maxPerm : 0
+alpha :6.8995e-310
+outpath : result/mina/

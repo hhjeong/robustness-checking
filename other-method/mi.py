@@ -29,7 +29,7 @@ import sys
 
 with open(sys.argv[1],'r') as inp:
 	if len(sys.argv) > 3 and sys.argv[3] == "discrete":
-		data = [[int(r)+1 for r in row.strip().split()] for row in inp]
+		data = [[int(r)+2 for r in row.strip().split()] for row in inp]
 	else:
 		data = [binning(map(float,row.strip().split())) for row in inp]
 
@@ -41,5 +41,5 @@ for i in xrange(len(data)):
 		ft.put(getMI(data[i],data[j]))
 
 with open(sys.argv[2],'w') as oup:
-	for line in ft.freq2bin(100,0.0,2.0):
+	for line in ft.freq2bin(100,0.0,1.0):
 		print >> oup, "%f\t%d" % line
