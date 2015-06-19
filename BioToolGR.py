@@ -22,6 +22,11 @@ class BioToolGR:
     def dropnabycolumn(self,data,name):
         return data[data[name].notnull()]
 
+
+    # This function filters out gene data which is not in "target_gene"
+    # Input *****
+    # original : gene list - original data
+    # target_gene : target gene list to filter out
     def build_target_kernel(self,kernel,original,target_gene):
         filtered_kernel = pd.DataFrame()
         
@@ -40,6 +45,9 @@ class BioToolGR:
     def write_csv(self,dataframe,filename):
         dataframe.to_csv(filename,sep='\t')
 
+
+    # This function extracts k number of rows randomly.
+    # If "duplicated" is set, rows already in the list  will be added.
     def pick_random_columns(self,kernel,outcome,k,duplicated=True):
         num = 0
         bucket = []
@@ -59,7 +67,21 @@ class BioToolGR:
             num += 1
         
         return new_kernel,new_outcome
-            
+
+    # This function extracts rows whose value is "outcome_value"
+    def pick_columns_outcome(self,kernel,outcome,outcome_value):
+        num = 0
+        new_kernel = pd.DataFrame()
+        new_outcome = pd.DataFrame(dtype=int)
+        column_len = len(kernel.columns)
+
+        for i,v in kernel.transpose().iterrows():
+            if outcome.loc[i][0] == outcome_value:
+                new_kernel = new_kernel.append(v)
+                new_outcome = new_outcome.append(outcome.loc[i])
+        
+        return new_kernel,new_outcome
+
 
     # This function builds dataset for the program 'Net-Cox' 
     # 'genomicMatrix' and 'clinical_data' files are required for this function call
@@ -142,7 +164,7 @@ class BioToolGR:
         self.build_nextcox_set(output)
 
     # 2015 6-17
-    def HynOrder4(self):
+    def HyunOrder4(self):
         METH = self.parse('original-data/METH.txt')
         CNA = self.parse('original-data/CNA.txt')
         mRNA = self.parse('original-data/mRNA.txt')
@@ -162,9 +184,8 @@ class BioToolGR:
         CNA_filtered.to_csv(CNA_name+'.txt',sep='\t',index=False,header=False)
         mRNA_filtered.to_csv(mRNA_name+'.txt',sep='\t',index=False,header=False)
         
-
     # 2015 6-8
-    def HynOrder3(self):
+    def HyunOrder3(self):
         METH = self.parse('METH.txt')
         CNA = self.parse('CNA.txt')
         mRNA = self.parse('mRNA.txt')
@@ -196,3 +217,27 @@ class BioToolGR:
         
             new_outcome = new_outcome.astype(int)
             new_outcome.to_csv(clinical_name + str(i) + '.txt',index=False,header=False)
+
+    #  
+    def HynOrder5(self):
+        METH = self.parse('original-data/METH.txt')
+        CNA = self.parse('original-data/CNA.txt')
+        mRNA = self.parse('original-data/mRNA.txt')
+        sym = self.parse('original-data/sym.txt')
+        target_gene = self.parse('original-data/target_gene.txt')
+        outcome = pd.read_csv('clinical.txt',header=None)
+        
+        METH_filtered = self.build_target_kernel(METH,sym,target_gene)
+        CNA_filtered = self.build_target_kernel(CNA,sym,target_gene)
+        mRNA_filtered = self.build_target_kernel(mRNA,sym,target_gene)
+
+        METH_0,dummy = self.pick_columns_outcome(METH_filtered,outcome,0)
+        METH_1,dummy = self.pick_columns_outcome(METH_filtered,outcome,1)
+
+        CNA_0,dummy = self.pick_columns_outcome(CNA_filtered,outcome,0)
+        CNA_1,dummy = self.pick_columns_outcome(CNA_filtered,outcome,1)
+
+        mRNA_0,dummy = self.pick_columns_outcome(mRNA_filtered,outcome,0)
+        mRNA_1,dummy = self.pick_columns_outcome(mRNA_filtered,outcome,1)
+
+        
