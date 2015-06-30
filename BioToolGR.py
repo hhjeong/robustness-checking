@@ -48,12 +48,11 @@ class BioToolGR:
 
     # This function extracts k number of rows randomly.
     # If "duplicated" is set, rows already in the list  will be added.
-    def pick_random_columns(self,kernel,outcome,k,duplicated=True):
+    def pick_random_columns(self,kernel,k,duplicated=True):
         num = 0
         bucket = []
         new_kernel = pd.DataFrame()
-        new_outcome = pd.DataFrame(dtype=int)
-        column_len = len(kernel)
+        dummy,column_len = kernel.shape
         
         while num < k:
             r = random.randint(0,column_len-1)
@@ -62,22 +61,21 @@ class BioToolGR:
                     continue
                 bucket.append(r)
             new_kernel = new_kernel.append(kernel.iloc[:,r])
-            new_outcome = new_outcome.append(outcome.iloc[r])
             num += 1
         
-        return new_kernel,new_outcome
+        return new_kernel
 
     # This function extracts rows whose value is "outcome_value"
     def pick_columns_outcome(self,kernel,outcome,outcome_value):
-        num = 0
         new_kernel = pd.DataFrame()
         new_outcome = pd.DataFrame(dtype=int)
-        column_len = len(kernel.columns)
+        column_len = len(outcome)
 
         for i,v in kernel.transpose().iterrows():
             if outcome.loc[i][0] == outcome_value:
+                print "THIS IS I:",i
                 new_kernel = new_kernel.append(v)
-                new_outcome = new_outcome.append(outcome.loc[i])
+                new_outcome = new_outcome.append(outcome.iloc[i])
         
         return new_kernel,new_outcome
 
@@ -233,35 +231,41 @@ class BioToolGR:
         CNA_filtered = self.build_target_kernel(CNA,sym,target_gene)
         mRNA_filtered = self.build_target_kernel(mRNA,sym,target_gene)
 
+        METH_filtered = METH_filtered.append(outcome.transpose())
+        CNA_filtered = CNA_filtered.append(outcome.transpose())
+        mRNA_filtered = mRNA_filtered.append(outcome.transpose())
 
-        # Extracts outcome-guided result
-        METH_0,METH_0_outcome = self.pick_columns_outcome(METH_filtered,outcome,0)
-        METH_1,METH_1_outcome = self.pick_columns_outcome(METH_filtered,outcome,1)
+        M = self.pick_random_columns(METH_filtered,int(k*l),duplicated=True)
+        C = self.pick_random_columns(CNA_filtered,int(k*l),duplicated=True)
+        R = self.pick_random_columns(mRNA_filtered,int(k*l),duplicated=True)
 
-        CNA_0,CNA_0_outcome = self.pick_columns_outcome(CNA_filtered,outcome,0)
-        CNA_1,CNA_1_outcome = self.pick_columns_outcome(CNA_filtered,outcome,1)
+        M0 = M[M.transpose().loc[0] == 0]
+        M1 = M[M.transpose().loc[0] == 1]
 
-        mRNA_0,mRNA_0_outcome = self.pick_columns_outcome(mRNA_filtered,outcome,0)
-        mRNA_1,mRNA_1_outcome = self.pick_columns_outcome(mRNA_filtered,outcome,1)
+        C0 = C[C.transpose().loc[0] == 0]
+        C1 = C[C.transpose().loc[0] == 1]
 
-        # Extracts k percentage of data with replacement, where 0 <= k <= 1. 
+        R0 = R[R.transpose().loc[0] == 0]
+        R1 = R[R.transpose().loc[0] == 1]
 
-        M0,dummy = self.pick_random_columns(METH_0,METH_0_outcome,int(k*l),duplicated=True)
-        M1,dummy = self.pick_random_columns(METH_1,METH_1_outcome,int(k*l),duplicated=True)
-        
-        C0,dummy = self.pick_random_columns(CNA_0,CNA_0_outcome,int(k*l),duplicated=True)
-        C1,dummy = self.pick_random_columns(CNA_1,CNA_1_outcome,int(k*l),duplicated=True)
-        
-        R0,dummy = self.pick_random_columns(mRNA_0,mRNA_0_outcome,int(k*l),duplicated=True)
-        R1,dummy = self.pick_random_columns(mRNA_1,mRNA_1_outcome,int(k*l),duplicated=True)
+        M = M0.append(M1)
+        mOutcome = M.transpose().loc[0]
 
-        print "DONE WITH PROCESSING...."
+        C = C0.append(C1)
+        cOutcome = C.transpose().loc[0]
 
-        M0.to_csv(filename + str("_METH0.txt"),sep='\t',index=False,header=False)
-        M1.to_csv(filename + str("_METH1.txt"),sep='\t',index=False,header=False)
+        R = R0.append(R1)
+        rOutcome = R.transpose().loc[0]
 
-        C0.to_csv(filename + str("_CNA0.txt"),sep='\t',index=False,header=False)
-        C1.to_csv(filename + str("_CNA1.txt"),sep='\t',index=False,header=False)
+        M = M.transpose().drop(0)
+        C = C.transpose().drop(0)
+        R = R.transpose().drop(0)
 
-        R0.to_csv(filename + str("_mRNA0.txt"),sep='\t',index=False,header=False)
-        R1.to_csv(filename + str("_mRNA1.txt"),sep='\t',index=False,header=False)
+
+        M.to_csv(filename + str("_METH.txt"),sep='\t',index=False,header=False)
+        C = C.astype(int)
+        C.to_csv(filename + str("_CNA.txt"),sep='\t',index=False,header=False)
+        R.to_csv(filename + str("_mRNA.txt"),sep='\t',index=False,header=False)
+
+        mOutcome = mOutcome.astype(int)
+        mOutcome.to_csv(filename + str("_clinical.txt"),index=False,header=False)

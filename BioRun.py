@@ -10,4 +10,7 @@ if __name__ == "__main__":
     for k in np.arange(0.1,1,0.1):
         name = str(int(k*100))
         name += "/RandomDataSet"
-        b.HynOrder5(home+name,k)
+        for i in range(100):
+            b.HynOrder5(home+name+str(i),k)
+
+        print "Done"
