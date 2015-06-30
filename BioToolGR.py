@@ -53,7 +53,7 @@ class BioToolGR:
         bucket = []
         new_kernel = pd.DataFrame()
         new_outcome = pd.DataFrame(dtype=int)
-        column_len = len(kernel.columns)
+        column_len = len(kernel)
         
         while num < k:
             r = random.randint(0,column_len-1)
@@ -61,9 +61,8 @@ class BioToolGR:
                 if r in bucket:
                     continue
                 bucket.append(r)
-
             new_kernel = new_kernel.append(kernel.iloc[:,r])
-            new_outcome = new_outcome.append(outcome.loc[r])
+            new_outcome = new_outcome.append(outcome.iloc[r])
             num += 1
         
         return new_kernel,new_outcome
@@ -218,26 +217,51 @@ class BioToolGR:
             new_outcome = new_outcome.astype(int)
             new_outcome.to_csv(clinical_name + str(i) + '.txt',index=False,header=False)
 
-    #  
-    def HynOrder5(self):
+    # June 30 2015
+    # Extracting k percentage of data from the original dataset
+    # Save in the name of "filename"
+    def HynOrder5(self,filename,k):
         METH = self.parse('original-data/METH.txt')
         CNA = self.parse('original-data/CNA.txt')
         mRNA = self.parse('original-data/mRNA.txt')
         sym = self.parse('original-data/sym.txt')
         target_gene = self.parse('original-data/target_gene.txt')
-        outcome = pd.read_csv('clinical.txt',header=None)
-        
+        outcome = pd.read_csv('original-data/clinical.txt',header=None)
+        l = len(outcome)
+
         METH_filtered = self.build_target_kernel(METH,sym,target_gene)
         CNA_filtered = self.build_target_kernel(CNA,sym,target_gene)
         mRNA_filtered = self.build_target_kernel(mRNA,sym,target_gene)
 
-        METH_0,dummy = self.pick_columns_outcome(METH_filtered,outcome,0)
-        METH_1,dummy = self.pick_columns_outcome(METH_filtered,outcome,1)
 
-        CNA_0,dummy = self.pick_columns_outcome(CNA_filtered,outcome,0)
-        CNA_1,dummy = self.pick_columns_outcome(CNA_filtered,outcome,1)
+        # Extracts outcome-guided result
+        METH_0,METH_0_outcome = self.pick_columns_outcome(METH_filtered,outcome,0)
+        METH_1,METH_1_outcome = self.pick_columns_outcome(METH_filtered,outcome,1)
 
-        mRNA_0,dummy = self.pick_columns_outcome(mRNA_filtered,outcome,0)
-        mRNA_1,dummy = self.pick_columns_outcome(mRNA_filtered,outcome,1)
+        CNA_0,CNA_0_outcome = self.pick_columns_outcome(CNA_filtered,outcome,0)
+        CNA_1,CNA_1_outcome = self.pick_columns_outcome(CNA_filtered,outcome,1)
 
+        mRNA_0,mRNA_0_outcome = self.pick_columns_outcome(mRNA_filtered,outcome,0)
+        mRNA_1,mRNA_1_outcome = self.pick_columns_outcome(mRNA_filtered,outcome,1)
+
+        # Extracts k percentage of data with replacement, where 0 <= k <= 1. 
+
+        M0,dummy = self.pick_random_columns(METH_0,METH_0_outcome,int(k*l),duplicated=True)
+        M1,dummy = self.pick_random_columns(METH_1,METH_1_outcome,int(k*l),duplicated=True)
         
+        C0,dummy = self.pick_random_columns(CNA_0,CNA_0_outcome,int(k*l),duplicated=True)
+        C1,dummy = self.pick_random_columns(CNA_1,CNA_1_outcome,int(k*l),duplicated=True)
+        
+        R0,dummy = self.pick_random_columns(mRNA_0,mRNA_0_outcome,int(k*l),duplicated=True)
+        R1,dummy = self.pick_random_columns(mRNA_1,mRNA_1_outcome,int(k*l),duplicated=True)
+
+        print "DONE WITH PROCESSING...."
+
+        M0.to_csv(filename + str("_METH0.txt"),sep='\t',index=False,header=False)
+        M1.to_csv(filename + str("_METH1.txt"),sep='\t',index=False,header=False)
+
+        C0.to_csv(filename + str("_CNA0.txt"),sep='\t',index=False,header=False)
+        C1.to_csv(filename + str("_CNA1.txt"),sep='\t',index=False,header=False)
+
+        R0.to_csv(filename + str("_mRNA0.txt"),sep='\t',index=False,header=False)
+        R1.to_csv(filename + str("_mRNA1.txt"),sep='\t',index=False,header=False)
