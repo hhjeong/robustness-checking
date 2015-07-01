@@ -225,12 +225,8 @@ class BioToolGR:
         sym = self.parse('original-data/sym.txt')
         target_gene = self.parse('original-data/target_gene.txt')
         outcome = pd.read_csv('original-data/clinical.txt',header=None)
-<<<<<<< HEAD
-        
-=======
         l = len(outcome)
 
->>>>>>> e57af778b79658edb290874c7bbb0b9b3a18ad13
         METH_filtered = self.build_target_kernel(METH,sym,target_gene)
         CNA_filtered = self.build_target_kernel(CNA,sym,target_gene)
         mRNA_filtered = self.build_target_kernel(mRNA,sym,target_gene)
