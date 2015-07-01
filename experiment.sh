@@ -1,19 +1,22 @@
 # !/bin/bash
 
-EXE="../MINA/bin/MINA"
+EXE="../../MINA/bin/MINA"
 SAM_PATH="sampling-data"
 RES_PATH="result"
 
-for((i=0;i<100;++i))
+for((i=10;i<100;i+=10))
 do
-    CMD="$EXE -ip ${SAM_PATH}/mRNA_filtered_random$i.txt";
-   	CMD+=" -ip ${SAM_PATH}/CNA_filtered_random$i.txt"
-   	CMD+=" -ip ${SAM_PATH}/METH_filtered_random$i.txt"
-   	CMD+=" -o ${RES_PATH}/mina/"
+    for((j=0;j<100;++j))
+    do
+	CMD="$EXE -ip ${SAM_PATH}/$i/RandomDataSet${j}_mRNA.txt";
+   	CMD+=" -ip ${SAM_PATH}/$i/RandomDataSet${j}_CNA.txt"
+   	CMD+=" -ip ${SAM_PATH}/$i/RandomDataSet${j}_METH.txt"
+   	CMD+=" -o ${RES_PATH}/mina/$i/"
 	CMD+=" dist"
    	CMD+=" -s ${SAM_PATH}/target_gene.txt"
-   	CMD+=" -io ${SAM_PATH}/clinical$i.txt"
+   	CMD+=" -io ${SAM_PATH}/$i/RandomDataSet${j}_clinical.txt"
 	CMD+=" -dhi 0.3"
 	echo $CMD
 	$CMD;
+    done
 done
