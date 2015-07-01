@@ -1,4 +1,4 @@
-#!/usr/bin/pypy
+#!/usr/bin/python
 
 size = 5
 def binning( row ):
@@ -25,7 +25,7 @@ def getMI( A, B ):
 
 	return entropy(sa,N) + entropy(sb,N) - entropy(tb,N)
 
-import sys
+import sys, numpy
 
 with open(sys.argv[1],'r') as inp:
 	if len(sys.argv) > 3 and sys.argv[3] == "discrete":
@@ -33,13 +33,9 @@ with open(sys.argv[1],'r') as inp:
 	else:
 		data = [binning(map(float,row.strip().split())) for row in inp]
 
-from FreqTable import FreqTable 
-ft = FreqTable()
-
-for i in xrange(len(data)):
-	for j in xrange(i+1,len(data)):
-		ft.put(getMI(data[i],data[j]))
+mi = [getMI(data[i],data[j]) for i in xrange(len(data)) for j in xrange(i+1,len(data))]
 
 with open(sys.argv[2],'w') as oup:
-	for line in ft.freq2bin(100,0.0,1.0):
-		print >> oup, "%f\t%d" % line
+	F, P = numpy.histogram(mi, 100)
+	for f, p in zip(F,P):
+		print >> oup, str(p) + '\t' + str(f)
